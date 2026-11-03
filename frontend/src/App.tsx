@@ -82,11 +82,52 @@ export default function App() {
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [reviewSuccess, setReviewSuccess] = useState(false);
 
-  // Live Supabase Sync
+  // Live Supabase Sync & Deep URL Navigation
   useEffect(() => {
     // Auto-open admin dashboard if URL is /admin or #admin
     if (window.location.pathname.includes('/admin') || window.location.hash.includes('admin')) {
       setIsAdminModalOpen(true);
+    }
+
+    // Handle Deep Page URLs
+    const path = window.location.pathname.toLowerCase().replace(/\/$/, '');
+    if (path.startsWith('/services/')) {
+      const slug = path.replace('/services/', '');
+      const found = initialServices.find((s) => s.slug.toLowerCase() === slug);
+      if (found) {
+        setActiveServiceModal(found);
+      }
+      setTimeout(() => {
+        document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
+      }, 300);
+    } else if (path === '/services') {
+      setTimeout(() => {
+        document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
+      }, 300);
+    } else if (path === '/about' || path === '/why-us') {
+      setTimeout(() => {
+        document.getElementById('why-us')?.scrollIntoView({ behavior: 'smooth' });
+      }, 300);
+    } else if (path === '/service-areas' || path === '/localities') {
+      setTimeout(() => {
+        document.getElementById('localities')?.scrollIntoView({ behavior: 'smooth' });
+      }, 300);
+    } else if (path === '/projects' || path === '/gallery' || path === '/workmanship') {
+      setTimeout(() => {
+        document.getElementById('portfolio')?.scrollIntoView({ behavior: 'smooth' });
+      }, 300);
+    } else if (path === '/reviews') {
+      setTimeout(() => {
+        document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth' });
+      }, 300);
+    } else if (path === '/faqs') {
+      setTimeout(() => {
+        document.getElementById('faqs')?.scrollIntoView({ behavior: 'smooth' });
+      }, 300);
+    } else if (path === '/contact' || path === '/book') {
+      setTimeout(() => {
+        document.getElementById('enquiry-form')?.scrollIntoView({ behavior: 'smooth' });
+      }, 300);
     }
 
     // 1. Site Settings

@@ -1,0 +1,11 @@
+# Robots.txt for A1 Chandu Plumbing Services
+# Website: https://www.a1chanduplumbingservices.in/
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://www.a1chanduplumbingservices.in/sitemap.xml
