@@ -10,9 +10,75 @@
       gtag('js', new Date());
       gtag('config', 'AW-18554102789');
 
-      function gtag_report_conversion() {
-        gtag('event', 'conversion', {'send_to': 'AW-18554102789/okwmCMrH4bEdEIXIpI9F'});
-      }
+      // Global Google Ads conversion handler with 3s throttling
+      (function () {
+        var lastConversionTime = 0;
+        function fireConversion() {
+          var now = Date.now();
+          if (now - lastConversionTime < 3000) {
+            return;
+          }
+          lastConversionTime = now;
+          window.gtag && window.gtag('event', 'conversion', {
+            'send_to': 'AW-18554102789/okwmCMrH4bEdEIXIpI9F'
+          });
+          console.log('[Ads] conversion fired');
+        }
+
+        window.gtag_report_conversion = fireConversion;
+
+        // 1. Document-level click listener (capture phase)
+        document.addEventListener(
+          'click',
+          function (e) {
+            try {
+              var target = e.target;
+              if (!target || !target.closest) return;
+
+              // Check for link matching: a[href^="tel:"], a[href*="wa.me"], a[href*="api.whatsapp.com"], a[href*="whatsapp"]
+              var link = target.closest(
+                'a[href^="tel:"], a[href*="wa.me"], a[href*="api.whatsapp.com"], a[href*="whatsapp"]'
+              );
+              if (link) {
+                fireConversion();
+                return;
+              }
+
+              // Check for button whose text contains "Call", "WhatsApp" or "Book"
+              var btn = target.closest('button, a, [role="button"]');
+              if (btn) {
+                var text = (btn.textContent || '').trim();
+                if (/(Call|WhatsApp|Book)/i.test(text)) {
+                  fireConversion();
+                  return;
+                }
+              }
+            } catch (err) {
+              // Do NOT block or delay click or navigation
+            }
+          },
+          true
+        );
+
+        // 2. Document-level submit listener (capture phase)
+        document.addEventListener(
+          'submit',
+          function (e) {
+            try {
+              var form = e.target;
+              if (form && form.tagName === 'FORM') {
+                if (form.querySelector('input[type="password"]')) {
+                  return; // ignore admin login form
+                }
+                fireConversion();
+              }
+            } catch (err) {
+              // Do NOT block or delay submission
+            }
+          },
+          true
+        );
+      })();
     </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
