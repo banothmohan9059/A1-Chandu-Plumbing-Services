@@ -37,6 +37,26 @@ import {
   Image as ImageIcon,
 } from 'lucide-react';
 
+// Google Ads Conversion Reporting
+declare global {
+  interface Window {
+    gtag_report_conversion?: () => void;
+    gtag?: (...args: any[]) => void;
+  }
+}
+
+function gtag_report_conversion() {
+  if (typeof window !== 'undefined') {
+    if (typeof window.gtag_report_conversion === 'function') {
+      window.gtag_report_conversion();
+    } else if (typeof window.gtag === 'function') {
+      window.gtag('event', 'conversion', {
+        send_to: 'AW-18554102789/okwmCMrH4bEdEIXIpI9F',
+      });
+    }
+  }
+}
+
 export default function App() {
   // Synchronous initial data ensures ZERO blank states
   const [settings, setSettings] = useState<SiteSettings>(initialSiteSettings);
@@ -159,6 +179,20 @@ export default function App() {
     api.getReviews().then((data) => {
       if (data && data.length > 0) setReviews(data);
     }).catch(console.error);
+
+    // Global listener for Call Now and WhatsApp conversions
+    const handleGlobalClick = (e: MouseEvent) => {
+      const target = (e.target as HTMLElement)?.closest('a');
+      if (!target) return;
+      const href = target.getAttribute('href') || '';
+      if (href.startsWith('tel:') || href.includes('wa.me') || href.includes('whatsapp.com')) {
+        gtag_report_conversion();
+      }
+    };
+    document.addEventListener('click', handleGlobalClick);
+    return () => {
+      document.removeEventListener('click', handleGlobalClick);
+    };
   }, []);
 
   // Filter services by category
@@ -229,6 +263,7 @@ export default function App() {
 
     setFormSubmitting(false);
     setFormSuccess(true);
+    gtag_report_conversion();
 
     // 3. Open WhatsApp with formatted booking and photo link
     window.open(`https://wa.me/91${settings.whatsapp || '7032270517'}?text=${waText}`, '_blank');
@@ -316,6 +351,7 @@ export default function App() {
               href={`https://wa.me/91${settings.whatsapp}?text=Hi%20Chandu,%20I%20have%20an%20urgent%20plumbing%20issue.`}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={gtag_report_conversion}
               className="flex items-center gap-1.5 text-emerald-300 hover:text-emerald-200 font-medium transition"
             >
               <MessageSquare className="w-3.5 h-3.5" />
@@ -323,6 +359,7 @@ export default function App() {
             </a>
             <a
               href={`tel:${settings.phone}`}
+              onClick={gtag_report_conversion}
               className="flex items-center gap-1.5 text-copper-300 hover:text-copper-200 font-bold transition"
             >
               <Phone className="w-3.5 h-3.5 text-copper-400" />
@@ -367,6 +404,7 @@ export default function App() {
               href={`https://wa.me/91${settings.whatsapp}?text=Hi%20Chandu,%20need%20plumbing%20assistance.`}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={gtag_report_conversion}
               className="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm transition shadow-sm"
             >
               <MessageSquare className="w-4 h-4" />
@@ -374,6 +412,7 @@ export default function App() {
             </a>
             <a
               href={`tel:${settings.phone}`}
+              onClick={gtag_report_conversion}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-teal-900 hover:bg-teal-800 text-white font-bold text-sm transition shadow-premium"
             >
               <Phone className="w-4 h-4 text-copper-400" />
@@ -403,6 +442,7 @@ export default function App() {
             <div className="flex flex-wrap justify-center lg:justify-start gap-4 mb-10">
               <a
                 href={`tel:${settings.phone}`}
+                onClick={gtag_report_conversion}
                 className="px-7 py-4 rounded-xl bg-copper-500 hover:bg-copper-600 text-white font-bold text-base transition shadow-copper-glow flex items-center gap-2.5"
               >
                 <Phone className="w-5 h-5" />
@@ -481,6 +521,7 @@ export default function App() {
               <div className="pt-5 border-t border-softgrey-200">
                 <a
                   href={`tel:${settings.phone}`}
+                  onClick={gtag_report_conversion}
                   className="w-full py-3.5 rounded-xl bg-teal-900 hover:bg-teal-800 text-white font-bold text-center flex items-center justify-center gap-2 transition"
                 >
                   <Phone className="w-4 h-4 text-copper-400" />
@@ -501,6 +542,7 @@ export default function App() {
           </span>
           <a
             href={`tel:${settings.phone}`}
+            onClick={gtag_report_conversion}
             className="underline font-bold hover:text-teal-950 transition"
           >
             Call 7032270517 for Priority Dispatch
@@ -691,6 +733,7 @@ export default function App() {
                 </button>
                 <a
                   href={`tel:${settings.phone}`}
+                  onClick={gtag_report_conversion}
                   className="px-4 py-2.5 rounded-xl bg-teal-900 hover:bg-teal-800 text-white font-bold text-xs sm:text-sm transition flex items-center gap-1.5"
                 >
                   <Phone className="w-3.5 h-3.5 text-copper-400" />
@@ -741,6 +784,7 @@ export default function App() {
                     <span className="text-[11px] text-charcoal-500">Miyapur / Hyderabad</span>
                     <a
                       href={`tel:${settings.phone}`}
+                      onClick={gtag_report_conversion}
                       className="text-xs font-bold text-teal-900 hover:text-copper-600 transition flex items-center gap-1"
                     >
                       Inquire Similar <ArrowRight className="w-3 h-3" />
@@ -1088,7 +1132,11 @@ export default function App() {
             <div className="space-y-3 text-sm text-teal-200">
               <div>
                 <div className="text-xs text-teal-400">Emergency & Appointments:</div>
-                <a href={`tel:${settings.phone}`} className="text-white font-bold text-base hover:text-copper-300">
+                <a
+                  href={`tel:${settings.phone}`}
+                  onClick={gtag_report_conversion}
+                  className="text-white font-bold text-base hover:text-copper-300"
+                >
                   +91 {settings.phone}
                 </a>
               </div>
@@ -1098,6 +1146,7 @@ export default function App() {
                   href={`https://wa.me/91${settings.whatsapp}?text=Hi%20Chandu`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={gtag_report_conversion}
                   className="text-emerald-300 font-semibold hover:underline"
                 >
                   +91 {settings.whatsapp}
@@ -1127,6 +1176,7 @@ export default function App() {
           href={`https://wa.me/91${settings.whatsapp}?text=Hi%20Chandu,%20I%20need%20plumbing%20help.`}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={gtag_report_conversion}
           className="w-14 h-14 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center shadow-2xl transition hover:scale-110"
           title="Chat on WhatsApp"
         >
@@ -1134,6 +1184,7 @@ export default function App() {
         </a>
         <a
           href={`tel:${settings.phone}`}
+          onClick={gtag_report_conversion}
           className="w-14 h-14 rounded-full bg-teal-900 hover:bg-teal-800 text-copper-400 flex items-center justify-center shadow-2xl transition hover:scale-110 border-2 border-copper-500"
           title="Direct Phone Call"
         >
@@ -1200,6 +1251,7 @@ export default function App() {
             <div className="pt-4 border-t border-softgrey-200 flex gap-4">
               <a
                 href={`tel:${settings.phone}`}
+                onClick={gtag_report_conversion}
                 className="flex-1 py-3.5 rounded-xl bg-copper-500 hover:bg-copper-600 text-white font-bold text-center flex items-center justify-center gap-2 transition"
               >
                 <Phone className="w-4 h-4" />
